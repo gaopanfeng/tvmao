@@ -12,7 +12,7 @@
     "cheerio": "^1.0.0-rc.2",
     "html-entities": "^1.2.1",
     "lodash": "^4.17.11",
-    "phantom": "6.0.3",
+    "axios": "0.18.0",
     "winston": "^3.2.1"
   }
 }
