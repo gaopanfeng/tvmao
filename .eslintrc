@@ -1,0 +1,21 @@
+{
+  "extends": "airbnb-base/legacy",
+  "parser": "babel-eslint",
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "rules": {
+    "linebreak-style": [0, "windows"], //换行风格
+    "indent": ["error", 4], //缩进风格
+    "no-plusplus": 0, //禁止使用++，--
+    "no-continue": 0, //禁止使用continue
+    "no-underscore-dangle": 0, //标识符不能以_开头或结尾
+    "no-param-reassign" : 0, //禁止给参数重新赋值
+    "max-len": [2, 300], //字符串最大长度
+    "no-bitwise": 0, //禁止使用按位运算符
+    "no-mixed-operators": 0,
+    "class-methods-use-this": 0,
+    "no-restricted-syntax": 0
+  }
+}

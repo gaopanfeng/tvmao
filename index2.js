@@ -42,6 +42,7 @@ const logger = winston.createLogger({
             if(res.status === 200){
                 const content = res.data;
                 const $ = cheerio.load(content);
+                let day = $('.weekcur span').html();
                 let $list = $('#pgrow>li');
                 let list = [];
                 //console.log(list.html());
@@ -53,10 +54,11 @@ const logger = winston.createLogger({
                     if(href && href.startsWith('/movie/')){
                         list.push({
                             tv:tv,
+                            date:day,
                             day:i,
                             time:$it.find('span').html(),
                             name:entities.decode(name),
-                            href:href
+                            href:'https://www.tvmao.com'+href
                         });
                     }
                 }
