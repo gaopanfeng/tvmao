@@ -51,12 +51,12 @@ const tpl = `
                                 sort: [
                                     {
                                         'date.keyword': {
-                                            order: 'desc'
+                                            order: 'asc'
                                         }
                                     },
                                     {
                                         'time.keyword': {
-                                            order: 'desc'
+                                            order: 'asc'
                                         }
                                     }
                                 ]
