@@ -39,7 +39,7 @@ const logger = winston.createLogger({
 
 (async function () {
     for (let tv of TVS.slice(0)) {
-        for (let i = 1; i <= 7/** 7 */; i++) {
+        for (let i = 1; i <= 14/** 7 */; i++) {
             let url = `${HEAD_URL}${tv}-w${i}.html`;
             console.log(url);
             let res = await axios.get(url);
