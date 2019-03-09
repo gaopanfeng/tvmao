@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const winston = require('winston');
+const phantom = require('phantom');
 const elasticsearch = require('elasticsearch');
 const client = new elasticsearch.Client({
     hosts: ['http://10.135.70.219:9200'],
@@ -36,18 +37,22 @@ const logger = winston.createLogger({
     ]
 });
 
-
 (async function () {
+    const instance = await phantom.create();
+    const page = await instance.createPage();
+    //page.on('onResourceRequested', function(requestData) {
+        // console.info('Requesting', requestData.url);
+    //});
     for (let tv of TVS.slice(0)) {
         for (let i = 1; i <= 14/** 7 */; i++) {
             let url = `${HEAD_URL}${tv}-w${i}.html`;
             console.log(url);
-            let res = await axios.get(url);
-            if (res.status === 200) {
-                const content = res.data;
+            let status = await page.open(url);
+            if(status === 'success'){
+                const content = await page.property('content');
                 const $ = cheerio.load(content);
                 let day = $('.weekcur span').html();
-                let $list = $('#pgrow>li');
+                let $list = $('#pgrow li');
                 let list = [];
                 // console.log(list.html());
                 for (let j = 0; j < $list.length; j++) {
@@ -81,4 +86,7 @@ const logger = winston.createLogger({
             }
         }
     }
+
+
+    await instance.exit();
 }());
