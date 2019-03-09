@@ -25,6 +25,8 @@ const tpl = `
         <a target="_blank" href="https://www.tvmao.com/program/{{it._source.tv}}-w1.html">{{it._source.tv}}>{{it._source.date}}-{{it._source.time}}</a>&nbsp;|&nbsp;
     {% endfor%}
     </td>
+    <td>{{movies.get(list[0]._source.href)}}
+    </td>
     </tr>
     {% endif %}
 {% endfor%}
@@ -34,7 +36,25 @@ const tpl = `
 </html>
 `;
 
+
+async function getMovies(){
+    let ret = await client.search({
+        index: 'tvmao-movie',
+        type: 'movie',
+        body: {
+            size: 1000
+        }
+    });
+
+    let movies = new Map();
+    ret.hits.hits.map(it=>it._source).forEach(it=>{
+        movies.set(it.href,it.content);
+    })
+    return movies;
+}
+
 (async ()=>{
+    let movies = await getMovies();
     let ret = await client.search({
         index: 'tvmao_*',
         type: 'tvmao',
@@ -71,6 +91,6 @@ const tpl = `
     });
     //console.log(JSON.stringify(ret, null, 4));
     fs.writeFileSync('es.json', JSON.stringify(ret, null, 4));
-    fs.writeFileSync('tv-es.html', nunjucks.renderString(tpl, ret), { encoding: 'utf-8' });
+    fs.writeFileSync('tv-es.html', nunjucks.renderString(tpl, {aggregations:ret.aggregations,movies}), { encoding: 'utf-8' });
 })();
 
