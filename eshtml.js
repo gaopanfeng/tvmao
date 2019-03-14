@@ -5,6 +5,11 @@ const client = new elasticsearch.Client({
     hosts: ['http://10.135.70.219:9200'],
     log: 'warning'
 });
+function num2str(num) {
+    return num < 10 ? ('0' + num) : ('' + num);
+}
+let today = new Date();
+let todayString = num2str(today.getMonth() + 1) + '-' + num2str(today.getDate());
 
 const tpl = `
 <!DOCTYPE html><html lang="zh-CN">
@@ -17,7 +22,7 @@ const tpl = `
 <table>
 {% for item in aggregations.movie.buckets%}
     {%set list = item.list.hits.hits%}
-    {% if list[0]._source.date <= '03-09' %}
+    {% if list[0]._source.date <= today %}
     <tr>
     <td style="width:200px;">{{loop.index}}.<a target="_blank" href="{{list[0]._source.href}}">{{item.key}}</a></td>
     <td>
@@ -37,7 +42,7 @@ const tpl = `
 `;
 
 
-async function getMovies(){
+async function getMovies() {
     let ret = await client.search({
         index: 'tvmao-movie',
         type: 'movie',
@@ -48,8 +53,8 @@ async function getMovies(){
 
     let movies = new Map();
     ret.hits.hits.map(it=>it._source).forEach(it=>{
-        movies.set(it.href,it.content);
-    })
+        movies.set(it.href, it.content);
+    });
     return movies;
 }
 
@@ -89,8 +94,9 @@ async function getMovies(){
             }
         }
     });
-    //console.log(JSON.stringify(ret, null, 4));
+    // console.log(JSON.stringify(ret, null, 4));
     fs.writeFileSync('es.json', JSON.stringify(ret, null, 4));
-    fs.writeFileSync('tv-es.html', nunjucks.renderString(tpl, {aggregations:ret.aggregations,movies}), { encoding: 'utf-8' });
+    fs.writeFileSync('tv-es.html', nunjucks.renderString(tpl, { aggregations: ret.aggregations, movies, today: todayString }), { encoding: 'utf-8' });
+    fs.writeFileSync('tv-es-all.html', nunjucks.renderString(tpl, { aggregations: ret.aggregations, movies, today: '12-31' }), { encoding: 'utf-8' });
 })();
 
