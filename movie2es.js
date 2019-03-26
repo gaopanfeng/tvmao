@@ -3,6 +3,7 @@ const elasticsearch = require('elasticsearch');
 const nunjucks = require('nunjucks');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const getUa = require('./getUa');
 const client = new elasticsearch.Client({
     hosts: ['http://10.135.70.219:9200'],
     log: 'warning'
@@ -79,7 +80,11 @@ async function getMovies(){
         let href = movie.href;
         let name = movie.name;
         let id = href.substring(href.lastIndexOf('/')+1);
-        let movieret = await axios.get(href.replace('https://','http://'));
+        let movieret = await axios.get(href.replace('https://','http://'),{
+            headers:{
+                'User-Agent':getUa()
+            }
+        });
         console.log(href,movieret.status);
         if(movieret.status === 200){
             let content = movieret.data;
