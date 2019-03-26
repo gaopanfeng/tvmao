@@ -1,3 +1,6 @@
 /.idea
 node_modules
 /.vscode
+*.html
+*.log
+es.json
