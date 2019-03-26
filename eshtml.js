@@ -95,7 +95,7 @@ async function getMovies() {
         }
     });
     // console.log(JSON.stringify(ret, null, 4));
-    fs.writeFileSync('es.json', JSON.stringify(ret, null, 4));
+    // fs.writeFileSync('es.json', JSON.stringify(ret, null, 4));
     fs.writeFileSync('tv-es.html', nunjucks.renderString(tpl, { aggregations: ret.aggregations, movies, today: todayString }), { encoding: 'utf-8' });
     fs.writeFileSync('tv-es-all.html', nunjucks.renderString(tpl, { aggregations: ret.aggregations, movies, today: '12-31' }), { encoding: 'utf-8' });
 })();
