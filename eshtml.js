@@ -17,9 +17,33 @@ const tpl = `
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width">
 <title>电视猫</title>
+<script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
 </head>
 <body>
-<table>
+<input id="search"><br>
+<script>
+$(function() {
+  var list = $('#list tr');
+  $('#search').on('input',function() {
+      var search = $(this).val();
+      list.each(function(i,e) {
+        var $tr = $(e);
+        if(!search){
+            $tr.show();
+            return;
+        }
+        var content = $tr.find('.content').text();
+        if(content.indexOf(search)!=-1){
+            $tr.show();
+        }else{
+            $tr.hide();
+        }
+      
+      })
+  });
+})
+</script>
+<table id="list">
 {% for item in aggregations.movie.buckets%}
     {%set list = item.list.hits.hits%}
     {% if list[0]._source.date <= today %}
@@ -30,7 +54,7 @@ const tpl = `
         <a target="_blank" href="https://www.tvmao.com/program/{{it._source.tv}}-w1.html">{{it._source.tv}}>{{it._source.date}}-{{it._source.time}}</a>&nbsp;|&nbsp;
     {% endfor%}
     </td>
-    <td>{{movies.get(list[0]._source.href)}}
+    <td class="content">{{movies.get(list[0]._source.href)}}
     </td>
     </tr>
     {% endif %}
