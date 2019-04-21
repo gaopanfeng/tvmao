@@ -26,6 +26,7 @@ $(function() {
   var list = $('#list tr');
   $('#search').on('input',function() {
       var search = $(this).val();
+      var arr = search.split(/\\s+/);
       list.each(function(i,e) {
         var $tr = $(e);
         if(!search){
@@ -34,6 +35,8 @@ $(function() {
         }
         var content = $tr.find('.content').text();
         if(content.indexOf(search)!=-1){
+            $tr.show();
+        }else if(arr.every(it=>content.indexOf(it)!=-1)){
             $tr.show();
         }else{
             $tr.hide();
