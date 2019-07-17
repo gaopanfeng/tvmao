@@ -74,7 +74,7 @@ async function getMovies() {
         index: 'tvmao-movie',
         type: 'movie',
         body: {
-            size: 1000
+            size: 10000
         }
     });
 
