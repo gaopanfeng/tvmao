@@ -3,7 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const getUa = require('./getUa');
 const client = new elasticsearch.Client({
-    hosts: ['http://10.135.70.219:9200'],
+    hosts: ['http://es01.nodemonitor.hb.ted:9200'],
     log: 'warning'
 });
 
@@ -75,7 +75,7 @@ async function getMovies() {
         if (movieret.status === 200) {
             let content = movieret.data;
             const $ = cheerio.load(content);
-            const text = $('.obj_meta').text();
+            const text = $('.obj-summary-info').text();
             await client.index({
                 index: 'tvmao-movie',
                 type: 'movie',
