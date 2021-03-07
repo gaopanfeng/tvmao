@@ -1,30 +1,24 @@
-const axios = require('axios');
 const cheerio = require('cheerio');
 const winston = require('winston');
-const phantom = require('phantom');
+const puppeteer = require('puppeteer');
 const elasticsearch = require('elasticsearch');
 const getUa = require('./getUa');
 const client = new elasticsearch.Client({
-    hosts: ['http://10.135.70.219:9200'],
-    log: 'warning'
+    hosts: ['http://es01.nodemonitor.hb.ted:9200'],
+    log: 'debug'
 });
 const Entities = require('html-entities').XmlEntities;
 const entities = new Entities();
 const HEAD_URL = 'https://www.tvmao.com/program/';
 const TVS = ['CCTV-CCTV6', 'CHC-CHC1', 'CHC-CHC2', 'CHC-CHC3'];
 
-
 const { combine, timestamp, label, printf } = winston.format;
 
-const myFormat = printf(({ level, message, label, timestamp }) => {
+const myFormat = printf(({ message }) => {
     return `${JSON.stringify(message)}`;
 });
 
-const format1 = combine(
-    label({ label: 'right meow!' }),
-    timestamp(),
-    myFormat
-);
+const format1 = combine(label({ label: 'right meow!' }), timestamp(), myFormat);
 
 const logger = winston.createLogger({
     level: 'info',
@@ -38,31 +32,33 @@ const logger = winston.createLogger({
     ]
 });
 
-function sleep(sec=1){
-    return new Promise((resolve,reject)=>{
-        setTimeout(()=>{
-            console.log('sleep '+ sec + 's');
+function sleep(sec = 1) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log('sleep ' + sec + 's');
             resolve();
-        },sec*1000);
+        }, sec * 1000);
     });
 }
 
 (async function () {
-    const instance = await phantom.create();
-    const page = await instance.createPage();
+    const browser = await puppeteer.launch({
+        headless: true
+    });
+    const page = await browser.newPage();
     //page.on('onResourceRequested', function(requestData) {
-        // console.info('Requesting', requestData.url);
+    // console.info('Requesting', requestData.url);
     //});
     for (let tv of TVS.slice(0)) {
-        for (let i = 1; i <= 14/** 7 */; i++) {
+        for (let i = 1; i <= 14 /** 7 */; i++) {
             await sleep(1);
             let url = `${HEAD_URL}${tv}-w${i}.html`;
             console.log(url);
-            page.setting('userAgent', getUa());
-            let status = await page.open(url);
-            // console.log(status);
-            if(status === 'success'){
-                const content = await page.property('content');
+            page.setUserAgent(getUa());
+            let response = await page.goto(url);
+            if (response.status() === 200) {
+                await (await page.$('.more-epg')).click();
+                const content = await page.content();
                 const $ = cheerio.load(content);
                 let day = $('.weekcur span').html();
                 let $list = $('#pgrow li');
@@ -84,7 +80,7 @@ function sleep(sec=1){
                         });
                     }
                 }
-                list.forEach(it=>{
+                list.forEach(it => {
                     logger.info(it);
                 });
 
@@ -99,7 +95,5 @@ function sleep(sec=1){
             }
         }
     }
-
-
-    await instance.exit();
-}());
+    await browser.close();
+})();
