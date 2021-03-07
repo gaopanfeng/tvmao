@@ -2,7 +2,7 @@ const fs = require('fs');
 const elasticsearch = require('elasticsearch');
 const nunjucks = require('nunjucks');
 const client = new elasticsearch.Client({
-    hosts: ['http://10.135.70.219:9200'],
+    hosts: ['http://es01.nodemonitor.hb.ted:9200'],
     log: 'warning'
 });
 function num2str(num) {
